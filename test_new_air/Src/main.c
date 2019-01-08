@@ -131,7 +131,7 @@ int main(void)
 
 
 //   HAL_UART_Transmit(&huart5, buf, strlen((const char *)buf), 10);
-   HAL_UART_Transmit_DMA(&huart5,buffer_test,5);
+   HAL_UART_Transmit_DMA(&huart5,buffer_test,strlen((const char *)buffer_test));
    HAL_Delay(800);
    
   }
