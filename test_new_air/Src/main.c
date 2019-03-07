@@ -43,6 +43,7 @@
 #include "dma.h"
 #include "usart.h"
 #include "gpio.h"
+#include "fmc.h"
 
 /* USER CODE BEGIN Includes */
 #include "string.h"
@@ -106,6 +107,7 @@ int main(void)
   MX_UART5_Init();
   MX_UART7_Init();
   MX_USART6_UART_Init();
+  MX_FMC_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
