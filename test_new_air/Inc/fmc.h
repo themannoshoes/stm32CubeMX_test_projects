@@ -48,6 +48,9 @@
 #include "main.h"
 
 /* USER CODE BEGIN Includes */
+  
+#define BSP_ERR (char)(-1)
+#define BSP_OK 0
 
 /* USER CODE END Includes */
 
@@ -63,6 +66,17 @@ void HAL_SDRAM_MspInit(SDRAM_HandleTypeDef* hsdram);
 void HAL_SDRAM_MspDeInit(SDRAM_HandleTypeDef* hsdram);
 
 /* USER CODE BEGIN Prototypes */
+
+/**
+ * \brief    :this function use to init sdram
+ * \detail   :use this function to init sdram sequence ,including opening clock 
+ *
+ * \param[in]:SDRAM_HandleTypeDef *hsdram :SDRAM handler typedef
+ *
+ * \retval : BSP_ERR:initsequence failure
+ * \retval : BSP_OK:initsequence success
+ */
+char sdram_init_sequence(SDRAM_HandleTypeDef *hsdram);
 
 /* USER CODE END Prototypes */
 

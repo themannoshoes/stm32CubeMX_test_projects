@@ -54,7 +54,8 @@
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 uint8_t buffer[100];
-char buffer_test[10] = "hello...\r\n";
+static char buffer_test[15] = "hello...\r\n";
+char buffer_test1[10] = "test1...\r\n";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -78,7 +79,8 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+   uint8_t test_1 = 0;
+  uint8_t len;
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -121,10 +123,11 @@ int main(void)
     HAL_GPIO_WritePin(GPIOD,GPIO_PIN_7,GPIO_PIN_SET);  //this is 485_EN_5
     HAL_GPIO_WritePin(GPIOI,GPIO_PIN_3,GPIO_PIN_SET);  //this is 485_EN_6
     HAL_GPIO_WritePin(GPIOA,GPIO_PIN_8,GPIO_PIN_SET);  //this is 485_EN_7
-
+   
    char buf[10] = "init...\r\n";
-   HAL_UART_Transmit(&huart3, buf, strlen((const char *)buf), 10);
+   HAL_UART_Transmit(&huart5, buf, strlen((const char *)buf), 10);
    HAL_UART_Receive_DMA(&huart3, buffer, 10);
+   sdram_init_sequence(&hsdram2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,11 +138,16 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-
-
-//   HAL_UART_Transmit(&huart5, buf, strlen((const char *)buf), 10);
-   HAL_UART_Transmit_DMA(&huart5,buffer_test,strlen((const char *)buffer_test));
-   HAL_Delay(800);
+   
+//   HAL_UART_Transmit_DMA(&huart5,buffer_test1,strlen((const char *)buffer_test));
+//   HAL_Delay(500);
+   
+   * (uint8_t *)(0xC0000000) = 9;
+   test_1 = *(uint8_t *)0xC0000000;
+   len = sprintf(buffer_test,"---test_1= %d--------\r\n",test_1);
+   
+   HAL_UART_Transmit_DMA(&huart5, buffer_test, len);
+   HAL_Delay(1000);
    
   }
   /* USER CODE END 3 */
@@ -160,14 +168,26 @@ void SystemClock_Config(void)
     */
   __HAL_RCC_PWR_CLK_ENABLE();
 
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLM = 24;
+  RCC_OscInitStruct.PLL.PLLN = 360;
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
+  RCC_OscInitStruct.PLL.PLLQ = 4;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
+    /**Activate the Over-Drive mode 
+    */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }
@@ -176,12 +196,12 @@ void SystemClock_Config(void)
     */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSE;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
   {
     _Error_Handler(__FILE__, __LINE__);
   }

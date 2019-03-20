@@ -1,4 +1,4 @@
 * commit id: 36bfbe
 在这个commit里，测试将NVIC的code generation勾上会有什么效果，实际测试并没有什么大的用处；这个generation只是将关于中断的初始化调用分离出来整合在一个新的函数里而已；
 
-* 
+* 在20190320这个commit里，将时钟的配置配成与能源控制器的一模一样，还有添加了configuration里面的fmc相关配置，sdram才工作正常；还有就是把测试用的buffer长度给加长了，之前的太短没有考虑字符串的\0字符，导致bug字符串一直被快速输出的情况
